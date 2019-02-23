@@ -1,0 +1,10 @@
+{
+    "connection": "mongodb://127.0.0.1:37017/sanya",
+    "port": "4000",
+    "cors": true,
+    "tile": {
+        "minZoom" : 0,
+        "maxZoom" : 20,
+        "buffer": 16
+    }
+}
