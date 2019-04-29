@@ -9,7 +9,7 @@ const tile = require('../core/tile');
 const cache = require('../core/cache');
 
 router.get('/all', function(req, res, next) {
-    Meta.find().exec( (err, docs) => {
+    Meta.find().populate([{"path": "symbol"}]).exec( (err, docs) => {
         if (err) {
             res.status(500);
             res.json(err);
@@ -52,16 +52,16 @@ router.post('/publish/shapefile', function(req, res, next) {
                         res.json(err);
                     }
                     else{
-                        schema.add(name);
-                        let geomType = "Point";
+                        schema.add(doc.toObject());
+                        /*let geomType = "Point";
                         switch (layer.geomType) {
-                            case 1:
+                            case gdal.wkbPoint:
                                 geomType = "Point";
-                            case 2:
+                            case gdal.wkbLineString:
                                 geomType = "LineString";
-                            case 3:
+                            case gdal.wkbPolygon:
                                 geomType = "Polygon";
-                        }
+                        }*/
                         const features = [];
                         const model = schema.model(name);
                         const srs = gdal.SpatialReference.fromEPSG(4326);

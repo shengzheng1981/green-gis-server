@@ -47,10 +47,11 @@ router.get('/vector/:name/:x/:y/:z', function(req, res, next) {
     }
 });
 
-router.get('/image/:name/:x/:y/:z', function(req, res, next) {
+router.get('/image/:name/:x/:y/:z', async function(req, res, next) {
     const model = schema.model(req.params.name);
+    const meta = schema.meta(req.params.name);
     const collection = cache.collection(req.params.name); // in memory or on the fly
-    if (!collection && !model) {
+    if (!model || !meta) {
         res.status(404);
         res.json({
             result: false,
@@ -70,20 +71,22 @@ router.get('/image/:name/:x/:y/:z', function(req, res, next) {
             return false;
         });
         res.setHeader('Content-Type', 'image/png');
-        canvas.draw(x, y, z, features).createPNGStream().pipe(res);
+        const ctx = await canvas.draw(meta, x, y, z, features);
+        ctx.createPNGStream().pipe(res);
     } else {
         const query =  {};
         query['zooms.' + z + '.tileMin.tileX'] = {'$lte': x };
         query['zooms.' + z + '.tileMin.tileY'] = {'$lte': y };
         query['zooms.' + z + '.tileMax.tileX'] = {'$gte': x };
         query['zooms.' + z + '.tileMax.tileY'] = {'$gte': y };
-        model.find(query).lean().exec( (err, features) => {
+        model.find(query).lean().exec( async (err, features) => {
             if (err) {
                 res.status(500);
                 res.json(err);
             } else {
                 res.setHeader('Content-Type', 'image/png');
-                canvas.draw(x, y, z, features).createPNGStream().pipe(res);
+                const ctx = await canvas.draw(meta, x, y, z, features);
+                ctx.createPNGStream().pipe(res);
             }
         });
     }

@@ -67,7 +67,27 @@ module.exports.calc = function(feature){
                 tileMax: tileMax,
                 pixelMax: pixelMax
             };
-        }  else if (feature.geometry.type === 'MultiPolygon'){
+        }  else if (feature.geometry.type === 'MultiLineString'){
+            let xmin = Number.MAX_VALUE, ymin = Number.MAX_VALUE, xmax = Number.MIN_VALUE, ymax = Number.MIN_VALUE;
+            feature.geometry.coordinates.forEach( line => {
+                line.forEach( point => {
+                    if (point[0] > xmax) xmax = point[0];
+                    if (point[1] > ymax) ymax = point[1];
+                    if (point[0] < xmin) xmin = point[0];
+                    if (point[1] < ymin) ymin = point[1];
+                });
+            });
+            let tileMin = convert.lngLat2Tile(xmin, ymax, z);
+            let pixelMin = convert.lngLat2Pixel(xmin, ymax, z);
+            let tileMax = convert.lngLat2Tile(xmax, ymin, z);
+            let pixelMax = convert.lngLat2Pixel(xmax, ymin, z);
+            zooms[z] = {
+                tileMin: tileMin,
+                pixelMin: pixelMin,
+                tileMax: tileMax,
+                pixelMax: pixelMax
+            };
+        } else if (feature.geometry.type === 'MultiPolygon'){
             let xmin = Number.MAX_VALUE, ymin = Number.MAX_VALUE, xmax = Number.MIN_VALUE, ymax = Number.MIN_VALUE;
             feature.geometry.coordinates.forEach( polygon => {
                 polygon.forEach( ring => {
