@@ -35,7 +35,8 @@ router.get('/vector/:name/:x/:y/:z', function(req, res, next) {
         query['zooms.' + z + '.tileMin.tileY'] = {'$lte': y };
         query['zooms.' + z + '.tileMax.tileX'] = {'$gte': x };
         query['zooms.' + z + '.tileMax.tileY'] = {'$gte': y };
-        model.find(query).lean().exec( (err, features) => {
+        model.find(query)
+            .lean().exec( (err, features) => {
             if (err) {
                 res.status(500);
                 res.json(err);
@@ -79,7 +80,8 @@ router.get('/image/:name/:x/:y/:z', async function(req, res, next) {
         query['zooms.' + z + '.tileMin.tileY'] = {'$lte': y };
         query['zooms.' + z + '.tileMax.tileX'] = {'$gte': x };
         query['zooms.' + z + '.tileMax.tileY'] = {'$gte': y };
-        model.find(query).lean().exec( async (err, features) => {
+        model.find(query)
+            .lean().exec( async (err, features) => {
             if (err) {
                 res.status(500);
                 res.json(err);

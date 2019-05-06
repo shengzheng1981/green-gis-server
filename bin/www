@@ -17,16 +17,23 @@ var cache = require('../core/cache');
 var port = normalizePort(config.port || '4000');
 app.set('port', port);
 
-mongoose.connect(config.connection, { useNewUrlParser: true }, function (err) {
+mongoose.connection.on('error',  (err) => {
     if (err) {
-        console.error(err);
-        process.exit(1);
+        //console.error(err);
+        //mongoose.disconnect();
+        //process.exit(1);
     }
 });
-mongoose.connection.on('open', function (ref) {
+mongoose.connection.on('disconnected',  () => {
+    //console.log('MongoDB disconnected!');
+    //mongoose.connect(config.connection, { useNewUrlParser: true, autoReconnect: true, reconnectTries: 60, reconnectInterval: 5000  } );
+});
+mongoose.connection.once('open',  (ref) => {
     schema.init();
     cache.init();
 });
+
+mongoose.connect(config.connection, { useNewUrlParser: true, autoReconnect: true, reconnectTries: 60, reconnectInterval: 5000  } );
 /**
  * Create HTTP server.
  */

@@ -8,6 +8,11 @@ const Symbol = require('../models/symbol');
 
 module.exports.init = function(){
     mongoose.connection.db.listCollections().toArray( (err, names) => {
+        mongoose.modelNames().forEach( name => {
+            if (name !== 'Meta' && name !== 'Symbol'){
+                mongoose.deleteModel(name);
+            }
+        });
         names.forEach( item => {
             if (item.name !== 'metas' && item.name !== 'symbols'){
                 const schema = new Schema({
@@ -18,7 +23,9 @@ module.exports.init = function(){
                 models[item.name] = mongoose.model(item.name, schema);
             }
         });
-        Meta.find().populate([{"path": "symbol"}]).lean().exec( (err, docs) => {
+        Meta.find()
+            //.populate([{"path": "renderer.simple.symbol"}, {"path": "renderer.category.categories.symbol"}, {"path": "renderer.class.breaks.symbol"}])
+            .lean().exec( (err, docs) => {
             docs.forEach( item => {
                 metas[item.name] = item;
             })
@@ -53,6 +60,14 @@ module.exports.model = function(name){
 
 module.exports.meta = function(name){
     return metas[name];
+};
+
+module.exports.remove = function(name){
+    delete metas[name];
+};
+
+module.exports.update = function(name, meta){
+    metas[name] = meta;
 };
 
 

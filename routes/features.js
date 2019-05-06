@@ -9,7 +9,9 @@ const tile = require('../core/tile');
 const cache = require('../core/cache');
 
 router.get('/all', function(req, res, next) {
-    Meta.find().populate([{"path": "symbol"}]).exec( (err, docs) => {
+    Meta.find()
+        .populate([{"path": "renderer.simple.symbol"}, {"path": "renderer.category.categories.symbol"}, {"path": "renderer.class.breaks.symbol"}])
+        .exec( (err, docs) => {
         if (err) {
             res.status(500);
             res.json(err);
@@ -44,8 +46,18 @@ router.post('/publish/shapefile', function(req, res, next) {
                     name: name,
                     geomType: layer.geomType,
                     tile: true,
-                    properties: layer.fields.getNames(),
+                    properties: [],
+                    renderer: {
+                        type: 0,
+                        simple: {}
+                    }
                 };
+                layer.fields.forEach( item => {
+                    meta.properties.push({
+                        name: item.name,
+                        type: item.type
+                    })
+                });
                 Meta.create(meta, (err, doc) => {
                     if (err) {
                         res.status(500);
@@ -87,7 +99,8 @@ router.post('/publish/shapefile', function(req, res, next) {
                                 console.log( name + ' published!');
                                 res.status(200);
                                 res.json({
-                                    result: true
+                                    result: true,
+                                    doc : doc
                                 });
                             }
                         });
@@ -141,9 +154,26 @@ router.get('/:name/remove',  (req, res) => {
                     res.status(500);
                     res.json(err);
                 } else {
+                    schema.remove(req.params.name);
                     res.status(200);
                     res.json({result:true});
                 }
+            });
+        }
+    });
+});
+
+router.post('/:name/update',  (req, res) => {
+    Meta.findOneAndUpdate({name: req.params.name}, req.body.feature, {new: true}, (err, doc) => {
+        if (err) {
+            res.status(500);
+            res.json(err);
+        } else {
+            schema.update(req.params.name, doc);
+            res.status(200);
+            res.json({
+                result:true,
+                doc : doc
             });
         }
     });

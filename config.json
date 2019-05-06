@@ -1,5 +1,5 @@
 {
-    "connection": "mongodb://localhost:37017/neijiang",
+    "connection": "mongodb://localhost:37017/sanya",
     "port": "4000",
     "cors": true,
     "tile": {

@@ -10,11 +10,11 @@ if (!fs.existsSync(upload_path)){
 }
 const upload = multer({ dest: upload_path });
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/',  (req, res, next) => {
     res.render('index', { title: 'Green GIS Server', port: config.port || '4000' });
 });
 
-router.post('/upload', upload.array('file'), function(req, res) {
+router.post('/upload', upload.array('file'),  (req, res) => {
     // move the file from the temporary location to the intended location
     req.files.forEach( file => {
         const origin_path = file.path;

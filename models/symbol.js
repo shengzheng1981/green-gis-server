@@ -11,15 +11,18 @@ const SymbolSchema = new Schema({
         radius: Number,
         width: Number,
         height: Number,
+        anchorX: Number,
+        anchorY: Number,
         marker: String,
-        stroke : String,
-        fill: String,
-        line: {
-            cap: String,
-            dash: Number,
-            join: String,
-            width: Number
-        }
+        stroke: Boolean,
+        fill: Boolean,
+        fillColor: String,
+        fillOpacity: Number,
+        color: String,
+        opacity: Number,
+        weight: Number,
+        lineCap: String,
+        lineJoin: String
     }              //size,marker,stroke,fill
 });
 const Symbol = mongoose.model('Symbol', SymbolSchema);
