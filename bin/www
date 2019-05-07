@@ -14,7 +14,7 @@ var cache = require('../core/cache');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(config.port || '4000');
+var port = normalizePort(process.env.PORT || config.port || '4000');
 app.set('port', port);
 
 mongoose.connection.on('error',  (err) => {
