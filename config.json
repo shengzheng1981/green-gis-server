@@ -1,5 +1,5 @@
 {
-    "connection": "mongodb://localhost:37017/sanya",
+    "connection": "mongodb://greengis:greengis@cluster0-shard-00-00-cvxqc.mongodb.net:27017,cluster0-shard-00-01-cvxqc.mongodb.net:27017,cluster0-shard-00-02-cvxqc.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true",
     "port": "4000",
     "cors": true,
     "tile": {
