@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
+const fs = require('fs');
 const schema = require('../core/schema');
 const convert = require('../core/convert');
 const cache = require('../core/cache');
 const canvas = require('../core/canvas');
 
-router.get('/vector/:name/:x/:y/:z', function(req, res, next) {
+router.get('/vector/:name/:x/:y/:z',  (req, res, next) => {
     const model = schema.model(req.params.name);
     const collection = cache.collection(req.params.name); // in memory or on the fly
     if (!collection && !model) {
@@ -48,7 +50,7 @@ router.get('/vector/:name/:x/:y/:z', function(req, res, next) {
     }
 });
 
-router.get('/image/:name/:x/:y/:z', async function(req, res, next) {
+router.get('/image/:name/:x/:y/:z', async (req, res, next) => {
     const model = schema.model(req.params.name);
     const meta = schema.meta(req.params.name);
     const collection = cache.collection(req.params.name); // in memory or on the fly
@@ -90,6 +92,18 @@ router.get('/image/:name/:x/:y/:z', async function(req, res, next) {
                 const ctx = await canvas.draw(meta, x, y, z, features);
                 ctx.createPNGStream().pipe(res);
             }
+        });
+    }
+});
+
+router.get('/static/:name/:x/:y/:z',  (req, res, next) => {
+    const file_path = path.join(path.dirname(__dirname) , "/public/statictiles/" + req.params.name + "/" + req.params.z + "/" + req.params.x +  "/" + req.params.y + ".png");
+    if ( fs.existsSync(file_path) ){
+        res.sendFile(file_path);
+    } else {
+        res.status(200);
+        res.json({
+            result: false
         });
     }
 });

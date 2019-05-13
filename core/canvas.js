@@ -74,15 +74,15 @@ module.exports.draw = async function(meta, x, y, z, features){
             return meta.renderer.simple ? meta.renderer.simple.symbol : defaultSymbol;
         } else if (meta.renderer.renderType === 1) {
             if (meta.renderer.category && meta.renderer.category.field && Array.isArray(meta.renderer.category.categories)) {
-                const category = meta.renderer.category.categories.find( item => item.value == feature.properties[meta.renderer.category.field]);
-                return category ? category.symbol : defaultSymbol;
+                const category = meta.renderer.category.categories.find( item => item.value == feature.properties[meta.renderer.category.field.name]);
+                return category ? (category.symbol || category)  : defaultSymbol;
             } else {
                 return defaultSymbol;
             }
         } else if (meta.renderer.renderType === 2) {
             if (meta.renderer.class && meta.renderer.class.field && Array.isArray(meta.renderer.class.breaks)) {
-                const category = meta.renderer.class.breaks.find( item => item.min <= feature.properties[meta.renderer.class.field] && item.max >= feature.properties[meta.renderer.class.field]);
-                return category ? category.symbol : defaultSymbol;
+                const category = meta.renderer.class.breaks.find( item => item.min <= feature.properties[meta.renderer.class.field.name] && item.max >= feature.properties[meta.renderer.class.field.name]);
+                return category ? (category.symbol || category) : defaultSymbol;
             } else {
                 return defaultSymbol;
             }

@@ -19,22 +19,32 @@ const MetaSchema = new Schema({
             }
         },
         category: {
-            field: String,
+            field: {},
             categories: [
                 {
+                    auto: Boolean,      // auto true: use type & style, false: use symbol reference
                     symbol : {
                         type : ObjectId,
                         ref  : 'Symbol'
                     },
                     value: String,
                     label: String,
+                    style : {
+                        radius: Number,
+                        fillColor: String,
+                        fillOpacity: Number,
+                        color: String,
+                        opacity: Number,
+                        weight: Number
+                    }
                 }
             ]
         },
         class: {
-            field: String,
+            field: {},
             breaks: [
                 {
+                    auto: Boolean,      // auto true: use type & style, false: use symbol reference
                     symbol : {
                         type : ObjectId,
                         ref  : 'Symbol'
@@ -42,6 +52,14 @@ const MetaSchema = new Schema({
                     min: Number,
                     max: Number,
                     label: String,
+                    style : {
+                        radius: Number,
+                        fillColor: String,
+                        fillOpacity: Number,
+                        color: String,
+                        opacity: Number,
+                        weight: Number
+                    }
                 }
             ]
         }

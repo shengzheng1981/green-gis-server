@@ -48,6 +48,18 @@ module.exports.add = function(meta){
             index['zooms.' + z + '.tileMax.tileX'] = -1;
             index['zooms.' + z + '.tileMax.tileY'] = -1;
             schema.index(index);
+           /* const index1 = {};
+            index1['zooms.' + z + '.tileMin.tileX'] = 1;
+            schema.index(index1);
+            const index2 = {};
+            index2['zooms.' + z + '.tileMin.tileY'] = 1;
+            schema.index(index2);
+            const index3 = {};
+            index3['zooms.' + z + '.tileMax.tileX'] = -1;
+            schema.index(index3);
+            const index4 = {};
+            index4['zooms.' + z + '.tileMax.tileY'] = -1;
+            schema.index(index4);*/
         }
         models[meta.name] = mongoose.model(meta.name, schema);
         metas[meta.name] = meta;
@@ -63,7 +75,9 @@ module.exports.meta = function(name){
 };
 
 module.exports.remove = function(name){
+    delete models[name];
     delete metas[name];
+    mongoose.deleteModel(name);
 };
 
 module.exports.update = function(name, meta){
