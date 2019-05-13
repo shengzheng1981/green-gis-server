@@ -1,6 +1,10 @@
 # Green GIS Server [![Build Status](https://travis-ci.org/shengzheng1981/green-gis-server.svg?branch=master)](https://travis-ci.org/shengzheng1981/green-gis-server)
 Green GIS Server is a light server for publishing shapefile. Using node-gdal to convert to JSON, it stores feature collection in mongodb. And also, it handles requests for geojson data\image tile data\vector tile data.
 
+# Demo
+1. http://gis.ispongecity.com
+2. http://green-gis-manager.herokuapp.com
+
 # Features
 1. publishing shapefile (just support shapefile now)
 2. return all or part of feature collection by geojson format
