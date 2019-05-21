@@ -9,6 +9,8 @@ var indexRouter = require('./routes/index');
 var featureRouter = require('./routes/features');
 var tileRouter = require('./routes/tiles');
 var symbolRouter = require('./routes/symbols');
+var mapRouter = require('./routes/maps');
+var labelRouter = require('./routes/labels');
 
 var app = express();
 
@@ -36,6 +38,8 @@ app.use('/', indexRouter);
 app.use('/features', featureRouter);
 app.use('/tiles', tileRouter);
 app.use('/symbols', symbolRouter);
+app.use('/maps', mapRouter);
+app.use('/labels', labelRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -33,7 +33,7 @@ module.exports.draw = async function(meta, x, y, z, features){
     };
 
     const getDefaultSymbol = () => {
-        if (meta.geomType === 0){
+        if (meta.geomType === 1){
             return {
                 type : 10,
                 style : {
@@ -45,19 +45,31 @@ module.exports.draw = async function(meta, x, y, z, features){
                     weight: 2
                 }
             }
-        } else if (meta.geomType === 1){
+        } else if (meta.geomType === 2){
             return {
-                type : 10,
+                type : 20,
                 style : {
                     color: '#ff0000',
                     opacity: 1,
                     weight: 2
                 }
             }
-        } else if (meta.geomType === 2){
+        } else if (meta.geomType === 3){
+            return {
+                type : 30,
+                style : {
+                    fillColor: '#ff0000',
+                    fillOpacity: 1,
+                    color: '#ff0000',
+                    opacity: 1,
+                    weight: 2
+                }
+            }
+        } else if (meta.geomType === 4){
             return {
                 type : 10,
                 style : {
+                    radius: 6,
                     fillColor: '#ff0000',
                     fillOpacity: 1,
                     color: '#ff0000',
@@ -150,6 +162,27 @@ module.exports.draw = async function(meta, x, y, z, features){
                 ctx.fillText(feature.properties.name, textX, textY);
             }*/
 
+        } else if (feature.geometry.type === 'MultiPoint') {
+            feature.geometry.coordinates.forEach( async (point,index) => {
+                let lng = point[0], lat = point[1];
+                let tileXY = convert.lngLat2Tile(lng, lat, z);
+                let pixelXY = convert.lngLat2Pixel(lng, lat, z);
+                let pixelX = pixelXY.pixelX + (tileXY.tileX - x) * 256;
+                let pixelY = pixelXY.pixelY + (tileXY.tileY - y) * 256;
+                if (symbol.type === 11) {
+                    symbol.style.image = symbol.style.image || await loadImage(path.join(path.join(path.join(path.dirname(__dirname), 'public'),'images'), symbol.style.marker || 'marker.png'));
+                    symbol.style.width =  symbol.style.width || 16;
+                    symbol.style.height =  symbol.style.height || 16;
+                    ctx.drawImage(symbol.style.image, pixelX, pixelY, symbol.style.width, symbol.style.height);
+                } else  {
+                    ctx.strokeStyle = getRGBA(symbol.style.color, symbol.style.opacity);
+                    ctx.fillStyle = getRGBA(symbol.style.fillColor, symbol.style.fillOpacity);
+                    ctx.beginPath(); //Start path
+                    ctx.arc(pixelX, pixelY, symbol.style.radius, 0, Math.PI * 2, true); // Draw a point using the arc function of the canvas with a point structure.
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            });
         } else if (feature.geometry.type === 'LineString') {
             ctx.strokeStyle = getRGBA(symbol.style.color, symbol.style.opacity);
             ctx.lineWidth = symbol.style.weight ? (symbol.style.weight || 2) : 2;
@@ -167,6 +200,25 @@ module.exports.draw = async function(meta, x, y, z, features){
                 }
             });
             ctx.stroke();
+        } else if (feature.geometry.type === 'MultiLineString') {
+            ctx.strokeStyle = getRGBA(symbol.style.color, symbol.style.opacity);
+            ctx.lineWidth = symbol.style.weight ? (symbol.style.weight || 2) : 2;
+            ctx.beginPath();
+            feature.geometry.coordinates.forEach( line => {
+                line.forEach( (point,index) => {
+                    let lng = point[0], lat = point[1];
+                    let tileXY = convert.lngLat2Tile(lng, lat, z);
+                    let pixelXY = convert.lngLat2Pixel(lng, lat, z);
+                    let pixelX = pixelXY.pixelX + (tileXY.tileX - x) * 256;
+                    let pixelY = pixelXY.pixelY + (tileXY.tileY - y) * 256;
+                    if (index === 0){
+                        ctx.moveTo(pixelX, pixelY);
+                    } else {
+                        ctx.lineTo(pixelX, pixelY);
+                    }
+                });
+                ctx.stroke();
+            });
         } else if (feature.geometry.type === 'Polygon') {
             ctx.strokeStyle = getRGBA(symbol.style.color, symbol.style.opacity);
             ctx.fillStyle = getRGBA(symbol.style.fillColor, symbol.style.fillOpacity);

@@ -10,6 +10,34 @@ const MetaSchema = new Schema({
     tile: Boolean,         //true: tile is ok (calculate and generate)
     cache: Boolean,        //cache in memory
     image: Boolean,        //static image
+    label: {
+        field: {},
+        offset: {
+            x : Number,
+            y : Number
+        },
+        placement: String,
+        font: {
+            family: String,
+            size: Number,
+            color: String,
+            bold: String
+        },
+        background: {
+            visible: Boolean,
+            padding: Number,
+            color: String
+        },
+        border: {
+            visible: Boolean,
+            width: Number,
+            color: String
+        },
+        zoom: {
+            min: Number,
+            max: Number
+        },
+    },
     renderer: {
         renderType: Number,       //0 Simple 1 Category 2 Class
         simple: {
