@@ -145,6 +145,35 @@ router.get('/geojson/:name', function(req, res, next) {
     }
 });
 
+router.get('/test/generate/:name', (req, res, next) => {
+    const model = schema.model(req.params.name);
+    const meta = schema.meta(req.params.name);
+    if (model && meta) {
+        const stats = model.aggregate([
+            { $unwind: { path: "$zooms", includeArrayIndex: "arrayIndex" } },
+            { $group: { _id: "$arrayIndex", minx: { $min: "$zooms.tileMin.tileX" }, miny: { $min: "$zooms.tileMin.tileY" }, maxx: { $max: "$zooms.tileMax.tileX" }, maxy: { $max: "$zooms.tileMax.tileY" }}},
+            { $project: { _id: 1, minx: 1, miny: 1, maxx: 1, maxy: 1  }}
+        ]).exec( (err, stats) => {
+            if (err) {
+                res.status(500);
+                res.json(err);
+            } else{
+                res.status(200);
+                res.json({
+                    result: true,
+                    stats: stats
+                });
+            }
+        });
+    }else {
+        res.status(404);
+        res.json({
+            result: false,
+            message: "model not found"
+        });
+    }
+});
+
 router.get('/generate/:name', (req, res, next) => {
     const model = schema.model(req.params.name);
     const meta = schema.meta(req.params.name);
