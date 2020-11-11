@@ -1,7 +1,7 @@
 const convert = require('./convert');
-const schema = require('./schema');
 const config = require('../config');
 
+/* calculate tile extent min&max */
 module.exports.calc = function(feature){
     const zooms = [];
     const { buffer = 16, minZoom = 0, maxZoom = 20 } = config.tile || {};
@@ -17,16 +17,16 @@ module.exports.calc = function(feature){
                     tileY : (pixelXY.pixelY - buffer) >= 0 ? tileXY.tileY :  tileXY.tileY - 1
                 },
                 pixelMin: {
-                    pixelX : (pixelXY.pixelX - buffer) >= 0 ? tileXY.pixelX :  pixelXY.pixelX - buffer + 256,
-                    pixelY : (pixelXY.pixelY - buffer) >= 0 ? tileXY.pixelY :  pixelXY.pixelX - buffer + 256
+                    pixelX : (pixelXY.pixelX - buffer) >= 0 ? pixelXY.pixelX :  pixelXY.pixelX - buffer + 256,
+                    pixelY : (pixelXY.pixelY - buffer) >= 0 ? pixelXY.pixelY :  pixelXY.pixelX - buffer + 256
                 },
                 tileMax: {
                     tileX : (pixelXY.pixelX + buffer) <= 256 ? tileXY.tileX :  tileXY.tileX + 1,
                     tileY : (pixelXY.pixelY + buffer) <= 256 ? tileXY.tileY :  tileXY.tileY + 1
                 },
                 pixelMax: {
-                    pixelX : (pixelXY.pixelX + buffer) <= 256 ? tileXY.pixelX :  pixelXY.pixelX + buffer - 256,
-                    pixelY : (pixelXY.pixelY + buffer) <= 256 ? tileXY.pixelY :  pixelXY.pixelX + buffer - 256
+                    pixelX : (pixelXY.pixelX + buffer) <= 256 ? pixelXY.pixelX :  pixelXY.pixelX + buffer - 256,
+                    pixelY : (pixelXY.pixelY + buffer) <= 256 ? pixelXY.pixelY :  pixelXY.pixelX + buffer - 256
                 }
             };
         } else if (feature.geometry.type === 'LineString'){
@@ -135,31 +135,6 @@ module.exports.calc = function(feature){
     };
 };
 
-module.exports.recreate = function(name){
-    const model = schema.model(name);
-    if (!model) return;
-    console.log(name + " start tile!");
-    model.find().lean().exec( (err, docs) => {
-        if (!err) {
-            const features = docs.map( feature => {
-                return {
-                    updateOne: {
-                        filter: { _id: feature._id },
-                        update : module.exports.calc(feature)
-                    }
-                };
-            });
-            console.log(name + " finish tile!");
-
-            console.log(name + " start store!");
-            model.bulkWrite(features, (err, res) => {
-                if (!err) {
-                    console.log(name + " finish store!");
-                }
-            });
-        }
-    });
-};
 
 
 

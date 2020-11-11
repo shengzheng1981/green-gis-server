@@ -36,8 +36,8 @@ const LabelSchema = new Schema({
         max: Number
     },
     map: {
-        type : ObjectId,
-        ref  : 'Map'
+        type: ObjectId,
+        ref: 'Map'
     }
 });
 const Label = mongoose.model('Label', LabelSchema);

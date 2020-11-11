@@ -1,20 +1,22 @@
 const config = require('../config');
 const mongoose = require('mongoose');
 const Schema   = mongoose.Schema;
-const models = {};             //schema (key,value); key: feature class name; value: mongoose schema model
-const metas = {};
-const Meta = require('../models/meta');
-const Symbol = require('../models/symbol');
+//schema (key,value); key: feature class name; value: mongoose schema model
+const models = {}; 
+//class (key,value);  key: feature class name; value: feature class      
+const classes = {};
+const FeatureClass = require('../models/feature-class');
 
+/* init schema. */
 module.exports.init = function(){
     mongoose.connection.db.listCollections().toArray( (err, names) => {
         mongoose.modelNames().forEach( name => {
-            if (name !== 'Meta' && name !== 'Symbol'){
+            if (name !== 'Meta'&& name !== 'FeatureClass' && name !== 'Layer' && name !== 'Symbol' && name !== 'Label' && name !== 'Map'){
                 mongoose.deleteModel(name);
             }
         });
         names.forEach( item => {
-            if (item.name !== 'metas' && item.name !== 'symbols'){
+            if (item.name !== 'metas' && item.name !== 'featureClasses' && item.name !== 'layers' && item.name !== 'symbols' && item.name !== 'labels' && item.name !== 'maps'){
                 const schema = new Schema({
                     geometry: {},
                     properties:{},
@@ -23,65 +25,64 @@ module.exports.init = function(){
                 models[item.name] = mongoose.model(item.name, schema);
             }
         });
-        Meta.find()
-            //.populate([{"path": "renderer.simple.symbol"}, {"path": "renderer.category.categories.symbol"}, {"path": "renderer.class.breaks.symbol"}])
+        FeatureClass.find()
             .lean().exec( (err, docs) => {
             docs.forEach( item => {
-                metas[item.name] = item;
+                classes[item.name] = item;
             })
         });
     });
 };
 
-module.exports.add = function(meta){
-    if (!(meta.name in models)) {
+/* add schema. */
+module.exports.add = function(cls){
+    if (!(cls.name in models)) {
         const schema = new Schema({
             geometry: {},
             properties:{},
             zooms : []
-        },{ collection: meta.name });
+        },{ collection: cls.name });
         const { minZoom = 0, maxZoom = 20 } = config.tile || {};
+        // add index, very important!!!
         for (z = minZoom; z <= maxZoom; z++){
             const index = {};
             index['zooms.' + z + '.tileMin.tileX'] = 1;
             index['zooms.' + z + '.tileMin.tileY'] = 1;
             index['zooms.' + z + '.tileMax.tileX'] = -1;
             index['zooms.' + z + '.tileMax.tileY'] = -1;
-            schema.index(index);
-           /* const index1 = {};
-            index1['zooms.' + z + '.tileMin.tileX'] = 1;
-            schema.index(index1);
-            const index2 = {};
-            index2['zooms.' + z + '.tileMin.tileY'] = 1;
-            schema.index(index2);
-            const index3 = {};
-            index3['zooms.' + z + '.tileMax.tileX'] = -1;
-            schema.index(index3);
-            const index4 = {};
-            index4['zooms.' + z + '.tileMax.tileY'] = -1;
-            schema.index(index4);*/
+            schema.index(index, { name: 'zoom_index_' + z });
         }
-        models[meta.name] = mongoose.model(meta.name, schema);
-        metas[meta.name] = meta;
+        models[cls.name] = mongoose.model(cls.name, schema);
+        classes[cls.name] = cls;
     }
 };
 
+/* get model. */
 module.exports.model = function(name){
+    if (!models[name]) {
+        throw new Error("model not found!");
+    }
     return models[name];
 };
 
-module.exports.meta = function(name){
-    return metas[name];
+/* get feature class. */
+module.exports.class = function(name){
+    if (!classes[name]) {
+        throw new Error("class not found!");
+    }
+    return classes[name];
 };
 
+/* remove schema. */
 module.exports.remove = function(name){
     delete models[name];
-    delete metas[name];
+    delete classes[name];
     mongoose.deleteModel(name);
 };
 
-module.exports.update = function(name, meta){
-    metas[name] = meta;
+/* update feature class, call by class updated. */
+module.exports.update = function(name, cls){
+    classes[name] = cls;
 };
 
 

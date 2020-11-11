@@ -1,16 +1,19 @@
-var config = require('./config');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+var config = require('./config');
+
 var indexRouter = require('./routes/index');
-var featureRouter = require('./routes/features');
-var tileRouter = require('./routes/tiles');
-var symbolRouter = require('./routes/symbols');
-var mapRouter = require('./routes/maps');
-var labelRouter = require('./routes/labels');
+var symbolsRouter = require('./routes/symbols');
+var featureClassesRouter = require('./routes/feature-classes');
+var featuresRouter = require('./routes/features');
+var tilesRouter = require('./routes/tiles');
+var layersRouter = require('./routes/layers');
+var mapsRouter = require('./routes/maps');
+var labelsRouter = require('./routes/labels');
 
 var app = express();
 
@@ -18,6 +21,7 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+// CORS 
 if (config.cors) {
     app.all('*', function(req, res, next) {
         //res.header("Access-Control-Allow-Origin", "http://localhost:9999");
@@ -30,16 +34,19 @@ if (config.cors) {
 }
 
 app.use(logger('dev'));
-app.use(express.json({limit: '50mb'}));
-app.use(express.urlencoded({limit: '50mb', extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use('/', indexRouter);
-app.use('/features', featureRouter);
-app.use('/tiles', tileRouter);
-app.use('/symbols', symbolRouter);
-app.use('/maps', mapRouter);
-app.use('/labels', labelRouter);
+app.use('/symbols', symbolsRouter);
+app.use('/featureClasses', featureClassesRouter);
+app.use('/features', featuresRouter);
+app.use('/tiles', tilesRouter);
+app.use('/layers', layersRouter);
+app.use('/maps', mapsRouter);
+app.use('/labels', labelsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

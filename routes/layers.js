@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Map = require("../models/map");
+const Layer = require("../models/layer");
 
 router.get('/',  (req, res, next) => {
-    Map.find().lean()
-        .populate([{path: 'layers.layer', model: 'Layer', populate: [{path: 'class', model: 'FeatureClass'}, {"path": "renderer.simple.symbol"}, {"path": "renderer.category.categories.symbol"}, {"path": "renderer.class.breaks.symbol"}] }])
+    Layer.find().lean()
+        .populate([{path: 'class', model: 'FeatureClass'}, {"path": "renderer.simple.symbol"}, {"path": "renderer.category.categories.symbol"}, {"path": "renderer.class.breaks.symbol"}])
         .sort({zindex : -1})
         .exec( (err,docs) => {
             if (err) {
@@ -18,8 +18,8 @@ router.get('/',  (req, res, next) => {
 });
 
 router.get('/detail/:id', (req, res, next) => {
-    Map.findOne({_id: req.params.id}).lean()
-        .populate([{path: 'layers.layer', model: 'Layer', populate: [{path: 'class', model: 'FeatureClass'}, {"path": "renderer.simple.symbol"}, {"path": "renderer.category.categories.symbol"}, {"path": "renderer.class.breaks.symbol"}] }])
+    Layer.findOne({_id: req.params.id}).lean()
+        .populate([{path: 'class', model: 'FeatureClass'}, {"path": "renderer.simple.symbol"}, {"path": "renderer.category.categories.symbol"}, {"path": "renderer.class.breaks.symbol"}])
         .exec( (err,doc) => {
             if (err) {
                 res.status(500);
@@ -32,7 +32,7 @@ router.get('/detail/:id', (req, res, next) => {
 });
 
 router.post('/create',  (req, res, next) => {
-    Map.create(req.body.group, (err, doc) => {
+    Layer.create(req.body.layer, (err, doc) => {
         if (err) {
             res.status(500);
             res.json(err);
@@ -47,8 +47,8 @@ router.post('/create',  (req, res, next) => {
     });
 });
 
-router.get('/:id/remove', (req, res, next) => {
-    Map.findOneAndRemove({_id: req.params.id},  (err, result) => {
+router.post('/:id/remove', (req, res, next) => {
+    Layer.findOneAndRemove({_id: req.params.id},  (err, result) => {
         if (err) {
             res.status(500);
             res.json(err);
@@ -62,7 +62,7 @@ router.get('/:id/remove', (req, res, next) => {
 });
 
 router.post('/:id/update', (req, res, next) => {
-    Map.findOneAndUpdate({_id: req.params.id}, req.body.group, {new: true},   (err, doc) => {
+    Layer.findOneAndUpdate({_id: req.params.id}, req.body.layer, {new: true},   (err, doc) => {
         if (err) {
             res.status(500);
             res.json(err);

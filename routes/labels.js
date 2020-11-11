@@ -63,9 +63,7 @@ router.get('/:id/remove', (req, res, next) => {
     Label.findOneAndRemove({_id: req.params.id},  (err, result) => {
         if (err) {
             res.status(500);
-            res.json({
-                result: false
-            });
+            res.json(err);
         } else {
             res.status(200);
             res.json({
@@ -83,7 +81,9 @@ router.post('/:id/update', (req, res, next) => {
             res.json(err);
         } else {
             res.status(200);
-            res.json({result:true});
+            res.json({
+                result:true
+            });
         }
     });
 });

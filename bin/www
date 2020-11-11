@@ -9,7 +9,6 @@ var debug = require('debug')('green-gis-server:server');
 var http = require('http');
 var mongoose = require('mongoose');
 var schema = require('../core/schema');
-var cache = require('../core/cache');
 /**
  * Get port from environment and store in Express.
  */
@@ -17,23 +16,13 @@ var cache = require('../core/cache');
 var port = normalizePort(process.env.PORT || config.port || '4000');
 app.set('port', port);
 
-mongoose.connection.on('error',  (err) => {
-    if (err) {
-        //console.error(err);
-        //mongoose.disconnect();
-        //process.exit(1);
-    }
-});
-mongoose.connection.on('disconnected',  () => {
-    //console.log('MongoDB disconnected!');
-    //mongoose.connect(config.connection, { useNewUrlParser: true, autoReconnect: true, reconnectTries: 60, reconnectInterval: 5000  } );
-});
+/**
+ * Connect mongodb.
+ */
 mongoose.connection.once('open',  (ref) => {
     schema.init();
-    cache.init();
 });
-
-mongoose.connect(config.connection, { useNewUrlParser: true, autoReconnect: true, reconnectTries: 60, reconnectInterval: 5000  } );
+mongoose.connect(config.connection, { useUnifiedTopology: true, useNewUrlParser: true } );
 /**
  * Create HTTP server.
  */
@@ -52,31 +41,26 @@ server.on('listening', onListening);
  * socket io
  */
 var io = require('socket.io')(server);
-io.on('connection',   (socket) => {
-    socket.on('stream',   (data) => {
-        const model = schema.model(data.name);
-        if (model) {
-            model.find().lean().exec( (err, features) => {
-                if (err) {
-                    socket.emit('error', err);
-                } else{
-                    const buffer = data.buffer || 1000;
-                    let temps = [];
-                    socket.emit('begin streaming', {count: features.length});
-                    features.forEach( (feature, index) => {
-                        if ( (index + 1) % buffer == 0 ) {
-                            socket.emit('streaming', temps);
-                            temps = [];
-                        } else {
-                            temps.push(feature);
-                        }
-                    });
+io.on('connection', (socket) => {
+    socket.on('stream', async (data) => {
+        try {
+            const model = schema.model(data.name);
+            const features = await model.find().select('-zooms').lean();
+            const buffer = data.buffer || 1000;
+            let temps = [];
+            socket.emit('begin streaming', {count: features.length});
+            features.forEach( (feature, index) => {
+                if ( (index + 1) % buffer == 0 ) {
                     socket.emit('streaming', temps);
-                    socket.emit('end streaming', {});
+                    temps = [];
+                } else {
+                    temps.push(feature);
                 }
             });
-        }else {
-            socket.emit('error', { message: "model not found"});
+            socket.emit('streaming', temps);
+            socket.emit('end streaming', {});
+        } catch (err) {
+            socket.emit('error', { message: err.message });
         }
     });
 
