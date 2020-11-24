@@ -58,6 +58,10 @@ module.exports.add = function(cls){
 };
 
 /* get model. */
+module.exports.exist = function(name){
+    return models[name];
+};
+
 module.exports.model = function(name){
     if (!models[name]) {
         throw new Error("model not found!");

@@ -15,8 +15,8 @@ module.exports.draw = async function(layer, x, y, z){
     ctx.fillStyle = 'rgba(255,0,0,1)';
     ctx.lineWidth = 2;
 
-    //no renderer
-    if(!layer.renderer || !layer.class) return canvas;
+    //no class
+    if(!layer.class) return canvas;
     //统一颜色格式为rgb或rgba
     const getRGBA = ( color, opacity ) => {
         color = color || '#ff0000';
@@ -93,6 +93,7 @@ module.exports.draw = async function(layer, x, y, z){
     //根据渲染方式获得符号
     const getSymbol = (feature) => {
         const defaultSymbol = getDefaultSymbol();
+        if (!layer.renderer) return defaultSymbol;
         switch (layer.renderer.method) {
             case 0: 
                 return layer.renderer.simple ? layer.renderer.simple.symbol : defaultSymbol;
