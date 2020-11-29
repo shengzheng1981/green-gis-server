@@ -47,7 +47,7 @@ router.post('/create',  (req, res, next) => {
     });
 });
 
-router.get('/:id/remove', (req, res, next) => {
+router.post('/:id/remove', (req, res, next) => {
     Map.findOneAndRemove({_id: req.params.id},  (err, result) => {
         if (err) {
             res.status(500);

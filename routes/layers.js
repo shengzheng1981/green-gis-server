@@ -4,7 +4,7 @@ const Layer = require("../models/layer");
 
 router.get('/',  (req, res, next) => {
     Layer.find().lean()
-        .populate([{path: 'class', model: 'FeatureClass'}, {"path": "renderer.simple.symbol"}, {"path": "renderer.category.categories.symbol"}, {"path": "renderer.class.breaks.symbol"}])
+        .populate([{path: 'class', model: 'FeatureClass'}])
         .sort({zindex : -1})
         .exec( (err,docs) => {
             if (err) {
@@ -19,7 +19,7 @@ router.get('/',  (req, res, next) => {
 
 router.get('/detail/:id', (req, res, next) => {
     Layer.findOne({_id: req.params.id}).lean()
-        .populate([{path: 'class', model: 'FeatureClass'}, {"path": "renderer.simple.symbol"}, {"path": "renderer.category.categories.symbol"}, {"path": "renderer.class.breaks.symbol"}])
+        .populate([{path: 'class', model: 'FeatureClass'}])
         .exec( (err,doc) => {
             if (err) {
                 res.status(500);

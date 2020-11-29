@@ -11,15 +11,16 @@ const LayerSchema = new Schema({
     min: Number,
     //zoom-max
     max: Number,
-    //mode: "geojson", "frontend", "backend", "static", "stream"
-    mode: String,
     //feature class
     class: {
         type: ObjectId,
         ref: 'FeatureClass'
     },
     label: {
-        field: String,
+        field: {
+            name: String,
+            type: {type: String}
+        },
         offset: {
             x: Number,
             y: Number
@@ -51,17 +52,64 @@ const LayerSchema = new Schema({
         method: Number,
         simple: {
             symbol: {
-                type: ObjectId,
-                ref: 'Symbol'
+                type:  {type: Number},
+                //size,marker,stroke,fill
+                style: {
+                    //Circle
+                    radius: Number,
+                    //Marker
+                    width: Number,
+                    height: Number,
+                    offsetX: Number,
+                    offsetY: Number,
+                    icon: String,
+                    //Stroke
+                    stroke: Boolean,
+                    strokeColor: String,
+                    strokeOpacity: Number,
+                    //Fill
+                    fill: Boolean,
+                    fillColor: String,
+                    fillOpacity: Number,
+                    //Line
+                    lineWidth: Number,
+                    lineCap: String,
+                    lineJoin: String
+                }
             }
         },
         category: {
-            field: String,
+            field: {
+                name: String,
+                type: {type: String}
+            },
             categories: [
                 {
                     symbol: {
-                        type: ObjectId,
-                        ref: 'Symbol'
+                        type:  {type: Number},
+                        //size,marker,stroke,fill
+                        style: {
+                            //Circle
+                            radius: Number,
+                            //Marker
+                            width: Number,
+                            height: Number,
+                            offsetX: Number,
+                            offsetY: Number,
+                            icon: String,
+                            //Stroke
+                            stroke: Boolean,
+                            strokeColor: String,
+                            strokeOpacity: Number,
+                            //Fill
+                            fill: Boolean,
+                            fillColor: String,
+                            fillOpacity: Number,
+                            //Line
+                            lineWidth: Number,
+                            lineCap: String,
+                            lineJoin: String
+                        }
                     },
                     value: String,
                     label: String
@@ -69,12 +117,37 @@ const LayerSchema = new Schema({
             ]
         },
         class: {
-            field: String,
+            field: {
+                name: String,
+                type: {type: String}
+            },
             breaks: [
                 {
                     symbol: {
-                        type: ObjectId,
-                        ref: 'Symbol'
+                        type:  {type: Number},
+                        //size,marker,stroke,fill
+                        style: {
+                            //Circle
+                            radius: Number,
+                            //Marker
+                            width: Number,
+                            height: Number,
+                            offsetX: Number,
+                            offsetY: Number,
+                            icon: String,
+                            //Stroke
+                            stroke: Boolean,
+                            strokeColor: String,
+                            strokeOpacity: Number,
+                            //Fill
+                            fill: Boolean,
+                            fillColor: String,
+                            fillOpacity: Number,
+                            //Line
+                            lineWidth: Number,
+                            lineCap: String,
+                            lineJoin: String
+                        }
                     },
                     min: Number,
                     max: Number,
