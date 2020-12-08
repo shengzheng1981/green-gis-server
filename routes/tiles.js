@@ -37,7 +37,7 @@ router.get('/image/:id/:x/:y/:z', async (req, res, next) => {
             };
         } else {
             //id == layer id
-            layer = await Layer.findOne({_id: req.params.id}).lean().populate([{path: 'class', model: 'FeatureClass'}, {"path": "renderer.simple.symbol"}, {"path": "renderer.category.categories.symbol"}, {"path": "renderer.class.breaks.symbol"}]);
+            layer = await Layer.findOne({_id: req.params.id}).lean().populate([{path: 'class', model: 'FeatureClass'}]);
         }
         res.setHeader('Content-Type', 'image/png');
         const ctx = await canvas.draw(layer, x, y, z);

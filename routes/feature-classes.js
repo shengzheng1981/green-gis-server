@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const gdal = require("gdal");
 const FeatureClass = require('../models/feature-class');
+const Layer = require("../models/layer");
 const schema = require('../core/schema');
 const tile = require('../core/tile');
 
@@ -106,26 +107,21 @@ router.post('/publish/shapefile/:name', extendTimeout, shape_upload.array('file'
 });
 
 /* 根据名称删除class. */
-router.post('/:name/remove',  (req, res) => {
-    FeatureClass.findOneAndRemove({name: req.params.name},  (err, result) => {
-        if (err) {
-            res.status(500);
-            res.json(err);
-        } else {
-            mongoose.connection.db.dropCollection(req.params.name,  (err, result) => {
-                if (err) {
-                    res.status(500);
-                    res.json(err);
-                } else {
-                    schema.remove(req.params.name);
-                    res.status(200);
-                    res.json({
-                        result:true
-                    });
-                }
-            });
-        }
-    });
+router.post('/:name/remove',  async (req, res) => {
+    try {
+        const cls = schema.class(req.params.name);
+        await FeatureClass.findOneAndRemove({_id: cls._id});
+        await Layer.remove({class: cls._id});
+        await mongoose.connection.db.dropCollection(req.params.name);
+        schema.remove(req.params.name);
+        res.status(200);
+        res.json({
+            result:true
+        });
+    } catch (err) {
+        res.status(500);
+        res.json(err);
+    }
 });
 
 /* 根据名称更新class. */

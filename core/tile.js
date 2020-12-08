@@ -7,6 +7,8 @@ module.exports.calc = function(feature){
     const { buffer = 16, minZoom = 0, maxZoom = 20 } = config.tile || {};
     for ( z = minZoom; z <= maxZoom; z++ ){
         if(feature.geometry.type === 'Point') {
+            feature.geometry.coordinates[0] = Math.round(feature.geometry.coordinates[0]*1000000) / 1000000;
+            feature.geometry.coordinates[1] = Math.round(feature.geometry.coordinates[1]*1000000) / 1000000;
             let lng = feature.geometry.coordinates[0], lat = feature.geometry.coordinates[1];
             let tileXY = convert.lngLat2Tile(lng, lat, z);
             let pixelXY = convert.lngLat2Pixel(lng, lat, z);
@@ -32,6 +34,8 @@ module.exports.calc = function(feature){
         } else if (feature.geometry.type === 'LineString'){
             let xmin = Number.MAX_VALUE, ymin = Number.MAX_VALUE, xmax = Number.MIN_VALUE, ymax = Number.MIN_VALUE;
             feature.geometry.coordinates.forEach( point => {
+                point[0] = Math.round(point[0]*1000000) / 1000000;
+                point[1] = Math.round(point[1]*1000000) / 1000000;
                 if (point[0] > xmax) xmax = point[0];
                 if (point[1] > ymax) ymax = point[1];
                 if (point[0] < xmin) xmin = point[0];
@@ -51,6 +55,8 @@ module.exports.calc = function(feature){
             let xmin = Number.MAX_VALUE, ymin = Number.MAX_VALUE, xmax = Number.MIN_VALUE, ymax = Number.MIN_VALUE;
             feature.geometry.coordinates.forEach( ring => {
                 ring.forEach( point => {
+                    point[0] = Math.round(point[0]*1000000) / 1000000;
+                    point[1] = Math.round(point[1]*1000000) / 1000000;
                     if (point[0] > xmax) xmax = point[0];
                     if (point[1] > ymax) ymax = point[1];
                     if (point[0] < xmin) xmin = point[0];
@@ -70,6 +76,8 @@ module.exports.calc = function(feature){
         } else if (feature.geometry.type === 'MultiPoint'){
             let xmin = Number.MAX_VALUE, ymin = Number.MAX_VALUE, xmax = Number.MIN_VALUE, ymax = Number.MIN_VALUE;
             feature.geometry.coordinates.forEach( point => {
+                point[0] = Math.round(point[0]*1000000) / 1000000;
+                point[1] = Math.round(point[1]*1000000) / 1000000;
                 if (point[0] > xmax) xmax = point[0];
                 if (point[1] > ymax) ymax = point[1];
                 if (point[0] < xmin) xmin = point[0];
@@ -89,6 +97,8 @@ module.exports.calc = function(feature){
             let xmin = Number.MAX_VALUE, ymin = Number.MAX_VALUE, xmax = Number.MIN_VALUE, ymax = Number.MIN_VALUE;
             feature.geometry.coordinates.forEach( line => {
                 line.forEach( point => {
+                    point[0] = Math.round(point[0]*1000000) / 1000000;
+                    point[1] = Math.round(point[1]*1000000) / 1000000;
                     if (point[0] > xmax) xmax = point[0];
                     if (point[1] > ymax) ymax = point[1];
                     if (point[0] < xmin) xmin = point[0];
@@ -110,6 +120,8 @@ module.exports.calc = function(feature){
             feature.geometry.coordinates.forEach( polygon => {
                 polygon.forEach( ring => {
                     ring.forEach(point => {
+                        point[0] = Math.round(point[0]*1000000) / 1000000;
+                        point[1] = Math.round(point[1]*1000000) / 1000000;
                         if (point[0] > xmax) xmax = point[0];
                         if (point[1] > ymax) ymax = point[1];
                         if (point[0] < xmin) xmin = point[0];
